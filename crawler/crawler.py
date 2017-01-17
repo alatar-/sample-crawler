@@ -3,7 +3,7 @@ import datetime
 import crawler.config as cfg
 from .parsers import crawl_catalog_pages
 
-OTOMOTO_DEALERS_CATALOG_URL = 'https://www.otomoto.pl/osobowe/%(city)s/?search%5Bfilter_enum_authorized_dealer%5D=1&search%5Bdist%5D=%(distance)d&search%5Bcountry%5D='
+OTOMOTO_DEALERS_CATALOG_URL = 'https://www.otomoto.pl/osobowe/%(city)s/?search%%5Bfilter_enum_authorized_dealer%%5D=1&search%%5Bdist%%5D=%(distance)d&search%%5Bcountry%%5D='
 
 
 def crawl_catalog(timestamp=None):
