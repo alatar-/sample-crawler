@@ -23,7 +23,7 @@ class TestParseOffer:
         assert '6008880069' == offer['id']
         assert self.url_offer_1 == offer['url']
         assert offer['promoted'] is True
-        assert 'dealer-url' not in offer
+        assert 'dealer' not in offer
 
     def test_listing_promoted_from_dealer_plus(self):
         fixture = load_fixture('listing_promoted_dealer_plus.html')
@@ -34,5 +34,5 @@ class TestParseOffer:
         assert '6008812949' == offer['id']
         assert self.url_offer_2 == offer['url']
         assert offer['promoted'] is True
-        assert 'dealer-url' in offer
-        assert self.url_dealer_1 == offer['dealer-url']
+        assert 'dealer' in offer
+        assert self.url_dealer_1 == offer['dealer']

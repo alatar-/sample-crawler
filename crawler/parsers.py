@@ -9,6 +9,6 @@ def parse_offer(l):
 
     l_d = l.find('div', 'seller-logo')
     if l_d is not None:
-        offer['dealer-url'] = l_d.a['href']
+        offer['dealer'] = l_d.a['href']
     
     return offer
