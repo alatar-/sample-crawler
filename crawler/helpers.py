@@ -2,13 +2,16 @@ import datetime
 
 import requests
 from bs4 import BeautifulSoup
+from twilio.rest import TwilioRestClient
+
+from .config import twilio
 
 
 def translate_timestamp(ts):
     translation = {
         'stycznia': 1,
         'lutego': 2,
-        'grudnia': 12
+        'grudnia': 12,
     }
 
     def multiple_replace(text, _dict):
@@ -27,3 +30,12 @@ def get_url_soup(url):
     soup = BeautifulSoup(result.content, 'html.parser')
 
     return soup
+
+
+def send_sms(number):
+    assert len(number) == 9
+
+    client = TwilioRestClient(twilio['sid'], twilio['token'])
+    message = client.messages.create(to="+48%s" % number, from_=twilio['origin-number'],
+                                     body=twilio['message'])
+    return message
