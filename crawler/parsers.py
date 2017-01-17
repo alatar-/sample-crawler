@@ -1,36 +1,38 @@
 import datetime
 import logging
 
-import crawler.db as db
 from .helpers import get_url_soup, translate_timestamp
-
+from .db import PseudoDB
 
 logger = logging.getLogger(__name__)
 
 
-def crawl_catalog_pages(url, timestamp, db_handle):
-    '''Crawl one page of the catalog and store entries. '''
-    logger.info("Crawling catalog page (%s)" % url)
-    soup_catalog = get_url_soup(url)
-    listings = soup_catalog.find_all('article', 'offer-item')
-    for l in listings:
-        offer = parse_catalog_listing(l)
-        logger.info("Parsed offer listing (%s)." % offer['id'])
+def crawl_catalog_pages(url, timestamp):
+    '''Iteratively crawl catalog pages and store offer entries.'''
+    with PseudoDB() as db:
+        while True:
+            logger.info("Crawling catalog page (%s)" % url)
+            soup_catalog = get_url_soup(url)
 
-        if 'dealer' not in offer:
-            logger.info("Dealer info not found. Crawling details page.")
-            soup_offer = get_url_soup(offer['url'])
-            offer = parse_offer_page(soup_offer, offer)
+            listings = soup_catalog.find_all('article', 'offer-item')
+            for l in listings:
+                offer = parse_catalog_listing(l)
+                logger.info("Parsed offer listing (%s)." % offer['id'])
 
-        db.store_offer(offer, db_handle)
+                if 'dealer' not in offer:
+                    logger.info("Dealer info not found. Crawling details page.")
+                    soup_offer = get_url_soup(offer['url'])
+                    offer = parse_offer_page(soup_offer, offer)
 
-        if not offer['promoted'] and \
-           offer.get('timestamp', datetime.datetime.now()) < timestamp:
+                db.store_offer(offer)
+
+                if not offer['promoted'] and \
+                   offer.get('timestamp', datetime.datetime.now()) < timestamp:
+                        break
+
+            url = get_next_page_url(soup_catalog)
+            if not url:
                 break
-
-    next_page_url = get_next_page_url(soup_catalog)
-    if next_page_url:
-        crawl_catalog_pages(next_page_url, timestamp, db_handle)
 
 
 def parse_offer_page(soup, offer):

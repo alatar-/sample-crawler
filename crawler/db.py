@@ -1,8 +1,26 @@
-def store_offer(offer, db):
-    dealer = offer.pop('dealer')
-    offer_id = offer.pop('id')
+import shelve
 
-    if not db.get('dealer', None):
-        db[dealer] = {}
+from .config import db_filename
 
-    db[dealer][offer_id] = offer
+
+class PseudoDB:
+    db = None
+
+    def __init__(self, filename=db_filename):
+        self.filename = filename
+
+    def __enter__(self):
+        self.db = shelve.open(self.filename)
+        return self
+
+    def __exit__(self, *args):
+        self.db.close()
+
+    def store_offer(self, offer):
+        dealer = offer.pop('dealer')
+        offer_id = offer.pop('id')
+
+        if not self.db.get('dealer', None):
+            self.db[dealer] = {}
+
+        self.db[dealer][offer_id] = offer

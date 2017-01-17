@@ -1,6 +1,5 @@
 import datetime
 import logging
-import shelve
 
 import crawler.config as cfg
 from .parsers import crawl_catalog_pages
@@ -23,5 +22,4 @@ def crawl_catalog(timestamp=None):
     if not timestamp:
         timestamp = datetime.datetime(2000, 1, 1)
 
-    with shelve.open(cfg.db_filename) as db_handle:
-        crawl_catalog_pages(url, timestamp, db_handle)
+    crawl_catalog_pages(url, timestamp)
