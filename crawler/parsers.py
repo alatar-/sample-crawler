@@ -1,20 +1,24 @@
 import datetime
+import logging
 
 from .helpers import get_url_soup, translate_timestamp
+
+logger = logging.getLogger(__name__)
 
 
 def crawl_catalog_pages(url, timestamp):
     '''Crawl one page of the catalog and store entries. '''
-    soup = get_url_soup(url)
-    listings = soup.find_all('article', 'offer-item')
+    logger.info("Crawling catalog page (%s)" % url)
+    soup_catalog = get_url_soup(url)
+    listings = soup_catalog.find_all('article', 'offer-item')
     for l in listings:
         offer = parse_catalog_listing(l)
+        logger.info("Parsed offer listing (%s)." % offer['id'])
 
-        # if general listing doesn't provide dealer information
-        # crawl its detail page
         if 'dealer' not in offer:
-            soup = get_url_soup(offer['url'])
-            offer = parse_offer_page(soup, offer)
+            logger.info("Dealer info not found. Crawling details page.")
+            soup_offer = get_url_soup(offer['url'])
+            offer = parse_offer_page(soup_offer, offer)
 
         # TODO: save to db
 
@@ -22,7 +26,7 @@ def crawl_catalog_pages(url, timestamp):
            offer.get('timestamp', datetime.datetime.now()) < timestamp:
                 break
 
-    next_page_url = get_next_page_url(soup)
+    next_page_url = get_next_page_url(soup_catalog)
     if next_page_url:
         crawl_catalog_pages(next_page_url, timestamp)
 

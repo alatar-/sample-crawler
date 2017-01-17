@@ -1,10 +1,16 @@
 import argparse
 import datetime
+import logging
 
 from crawler import crawl_catalog
 
 
 def execute(args):
+    if args.debug:
+        logging.basicConfig(level=logging.DEBUG)
+    else:
+        logging.basicConfig(level=logging.INFO)
+
     if args.mode == 'store':
         crawl_catalog(args.timestamp)
     elif args.mode == 'detect':
@@ -23,6 +29,8 @@ if __name__ == '__main__':
     parser_mode_detect = subparsers.add_parser('detect', help="Detect finalized transations.")
     parser_mode_detect.add_argument('-s', '--schedule', metavar='M', type=int, nargs='?', const=60, default=argparse.SUPPRESS,
                                     help='Schedule iterative execution every M minutes.')
+
+    parser.add_argument('--debug', action='store_true', help="Enable debug loggers.")
 
     args = parser.parse_args()
     execute(args)

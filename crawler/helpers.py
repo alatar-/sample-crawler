@@ -1,3 +1,4 @@
+import logging
 import datetime
 
 import requests
@@ -5,6 +6,8 @@ from bs4 import BeautifulSoup
 from twilio.rest import TwilioRestClient
 
 from .config import twilio
+
+logger = logging.getLogger(__name__)
 
 
 def translate_timestamp(ts):
