@@ -1,12 +1,14 @@
 import datetime
 import logging
 
+import crawler.db as db
 from .helpers import get_url_soup, translate_timestamp
+
 
 logger = logging.getLogger(__name__)
 
 
-def crawl_catalog_pages(url, timestamp):
+def crawl_catalog_pages(url, timestamp, db_handle):
     '''Crawl one page of the catalog and store entries. '''
     logger.info("Crawling catalog page (%s)" % url)
     soup_catalog = get_url_soup(url)
@@ -20,7 +22,7 @@ def crawl_catalog_pages(url, timestamp):
             soup_offer = get_url_soup(offer['url'])
             offer = parse_offer_page(soup_offer, offer)
 
-        # TODO: save to db
+        db.store_offer(offer, db_handle)
 
         if not offer['promoted'] and \
            offer.get('timestamp', datetime.datetime.now()) < timestamp:
@@ -28,7 +30,7 @@ def crawl_catalog_pages(url, timestamp):
 
     next_page_url = get_next_page_url(soup_catalog)
     if next_page_url:
-        crawl_catalog_pages(next_page_url, timestamp)
+        crawl_catalog_pages(next_page_url, timestamp, db_handle)
 
 
 def parse_offer_page(soup, offer):

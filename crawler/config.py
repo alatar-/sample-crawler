@@ -9,3 +9,5 @@ twilio = {
     'origin-number': "+481111",
     'message': "Your car listed on otomoto.pl have been acquired. Congratulations!",
 }
+
+db_filename = 'crawler.db'

@@ -1,9 +1,13 @@
 import datetime
+import logging
+import shelve
 
 import crawler.config as cfg
 from .parsers import crawl_catalog_pages
 
 OTOMOTO_DEALERS_CATALOG_URL = 'https://www.otomoto.pl/osobowe/%(city)s/?search%%5Bfilter_enum_authorized_dealer%%5D=1&search%%5Bdist%%5D=%(distance)d&search%%5Bcountry%%5D='
+
+logger = logging.getLogger(__name__)
 
 
 def crawl_catalog(timestamp=None):
@@ -19,4 +23,5 @@ def crawl_catalog(timestamp=None):
     if not timestamp:
         timestamp = datetime.datetime(2000, 1, 1)
 
-    crawl_catalog_pages(url, timestamp)
+    with shelve.open(cfg.db_filename) as db_handle:
+        crawl_catalog_pages(url, timestamp, db_handle)
