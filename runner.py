@@ -2,7 +2,7 @@ import argparse
 import datetime
 import logging
 
-from crawler import crawl_catalog
+from crawler import crawl_catalog, crawl_changes
 
 
 def execute(args):
@@ -14,7 +14,7 @@ def execute(args):
     if args.mode == 'store':
         crawl_catalog(args.timestamp)
     elif args.mode == 'detect':
-        raise Exception("Not implemented yet.")
+        crawl_changes()
 
 
 if __name__ == '__main__':

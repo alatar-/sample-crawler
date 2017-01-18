@@ -35,6 +35,31 @@ def crawl_catalog_pages(url, timestamp):
                 break
 
 
+def crawl_dealers_pages():
+    '''Crawl dealers pages and return current offers ids..'''
+    dealers = None
+    with PseudoDB() as db:
+        dealers = db.get_dealers()
+
+    current_offers = set()
+    # import pdb; pdb.set_trace()
+    for url in dealers:
+        while True:
+            logger.info("Crawling dealers page (%s)" % url)
+            soup_catalog = get_url_soup(url)
+            listings = soup_catalog.find_all('article', 'offer-item')
+            for l in listings:
+                offer = parse_catalog_listing(l)
+                logger.info("Parsed offer listing (%s)." % offer['id'])
+                current_offers.add(offer['id'])
+
+            url = get_next_page_url(soup_catalog)
+            if not url:
+                break
+
+    return current_offers
+
+
 def parse_offer_page(soup, offer):
     '''Parse offer details page for timestamp and dealer info.'''
     timestamp = soup.find('span', 'offer-meta__item').find('span', 'offer-meta__value').get_text()
@@ -54,14 +79,14 @@ def parse_catalog_listing(l):
     offer['url'] = l_a['href']
 
     l_d = l.find('div', 'seller-logo')
-    if l_d is not None:
+    if l_d is not None and l_d.a:
         offer['dealer'] = l_d.a['href']
     
     return offer
 
 
 def get_next_page_url(soup):
-    next_page = soup.find('ul', 'om-pager').find('li', 'next')
+    next_page = soup.find('li', 'next')
     if next_page:
         return next_page.a['href']
     else:
