@@ -12,7 +12,7 @@ def crawl_catalog_pages(url, timestamp):
     '''Iteratively crawl catalog pages and store offer entries.'''
     with PseudoDB() as db:
         while True:
-            logger.info("Crawling catalog page (%s)" % url)
+            logger.debug("Crawling catalog page (%s)" % url)
             soup_catalog = get_url_soup(url)
 
             listings = soup_catalog.find_all('article', 'offer-item')
@@ -43,10 +43,9 @@ def crawl_dealers_pages():
         dealers = db.get_dealers()
 
     current_offers = set()
-    # import pdb; pdb.set_trace()
     for url in dealers:
         while True:
-            logger.info("Crawling dealers page (%s)" % url)
+            logger.debug("Crawling dealers page (%s)" % url)
             soup_catalog = get_url_soup(url)
             listings = soup_catalog.find_all('article', 'offer-item')
             for l in listings:
@@ -67,6 +66,8 @@ def crawl_phone_number(req_url, offer_url):
     try:
         _json = get_url_json(req_url % req_id)
     except JSONDecodeError:
+        # Otomoto returns "Nie znaleziono strony" for the dealers who
+        # not provided the phone number.
         logger.warning("Phone number for the dealer can't be retrieved.")
         return None
 

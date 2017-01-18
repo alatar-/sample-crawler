@@ -34,15 +34,15 @@ if __name__ == '__main__':
     subparsers = parser.add_subparsers(dest='mode')
     subparsers.required = True
     
-    parser_mode_store = subparsers.add_parser('store', help="Crawl and store the offers.")
+    parser_mode_store = subparsers.add_parser('store', help="crawl and store the catalog offers")
     parser_mode_store.add_argument('-t', '--timestamp', metavar='TS', type=lambda s: datetime.datetime.strptime(s, '%Y-%m-%dT%H:%M'),
-                                   help='Timestamp limiting the older listings to be ignored, e.g. 2017-01-17T12:00')
+                                   help='limit crawling to offers newer than TS, e.g. 2017-01-17T12:00')
     
-    parser_mode_detect = subparsers.add_parser('detect', help="Detect finalized transations.")
+    parser_mode_detect = subparsers.add_parser('detect', help="detect finalized transations and congratulate sellers")
     parser_mode_detect.add_argument('-s', '--schedule', metavar='M', type=int, nargs='?', const=60, default=argparse.SUPPRESS,
-                                    help='Schedule iterative execution every M minutes.')
+                                    help='schedule iterative execution every M minutes')
 
-    parser.add_argument('--debug', action='store_true', help="Enable debug loggers.")
+    parser.add_argument('--debug', action='store_true', help="enable debug loggers")
 
     args = parser.parse_args()
     set_logging(args.debug)

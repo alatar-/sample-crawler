@@ -44,8 +44,9 @@ def get_url_json(url):
 
 
 def send_sms(number):
-    number = number.replace(' ', '')
-    assert len(number) == 9
+    translation_table = dict.fromkeys(map(ord, '-() '), None)
+    number = number.translate(translation_table).lstrip('+48')
+    assert len(number) <= 9, "Invalid phone number '%s'." % number
 
     logger.info('Sending sms to %s' % number)
     # client = TwilioRestClient(twilio['sid'], twilio['token'])
