@@ -1,5 +1,6 @@
 import logging
 import datetime
+import json
 
 import requests
 from bs4 import BeautifulSoup
@@ -35,10 +36,18 @@ def get_url_soup(url):
     return soup
 
 
+def get_url_json(url):
+    result = requests.get(url)
+    _json = json.loads(result.text)
+
+    return _json
+
+
 def send_sms(number):
+    number = number.replace(' ', '')
     assert len(number) == 9
 
-    client = TwilioRestClient(twilio['sid'], twilio['token'])
-    message = client.messages.create(to="+48%s" % number, from_=twilio['origin-number'],
-                                     body=twilio['message'])
-    return message
+    logger.info('Sending sms to %s' % number)
+    # client = TwilioRestClient(twilio['sid'], twilio['token'])
+    # client.messages.create(to="+48%s" % number, from_=twilio['origin-number'],
+    #                        body=twilio['message'])
