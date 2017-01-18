@@ -1,20 +1,32 @@
 import argparse
 import datetime
 import logging
+import schedule
+import time
 
 from crawler import crawl_catalog, crawl_changes
 
 
-def execute(args):
-    if args.debug:
-        logging.basicConfig(level=logging.DEBUG)
-    else:
-        logging.basicConfig(level=logging.INFO)
+def set_logging(debug):
+    level = logging.DEBUG if debug else logging.INFO
+    logging.basicConfig(
+        level=level,
+        format='%(asctime)s %(levelname)-8s %(name)-16s %(message)s',
+        datefmt='%H:%M:%S',
+    )
 
+
+def execute(args):
     if args.mode == 'store':
         crawl_catalog(args.timestamp)
-    elif args.mode == 'detect':
+    
+    if args.mode == 'detect':
         crawl_changes()
+        if 'schedule' in args:
+            schedule.every(args.schedule).minutes.do(crawl_changes)
+            while True:
+                schedule.run_pending()
+                time.sleep(1)
 
 
 if __name__ == '__main__':
@@ -33,4 +45,5 @@ if __name__ == '__main__':
     parser.add_argument('--debug', action='store_true', help="Enable debug loggers.")
 
     args = parser.parse_args()
+    set_logging(args.debug)
     execute(args)
